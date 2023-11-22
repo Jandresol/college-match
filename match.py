@@ -30,5 +30,5 @@ df['Total_Score'] = df[['Size_Score', 'Tuition_Score', 'Admission_Score', 'Gradu
 df['Percent_Match'] = (df['Total_Score'] / df['Total_Score'].max()) * 100
 
 # Display the top matching institutions
-top_matches = df.sort_values(by='Percent_Match', ascending=False).head(10)
+top_matches = df.sort_values(by='Percent_Match', ascending=True).head(10)
 print(top_matches[['institution name', 'Percent_Match']])
