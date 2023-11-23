@@ -6,29 +6,58 @@ df = pd.read_csv(csv_path)
 
 # User preferences (example values, replace with user input)
 user_preferences = {
-    'Institution Size': 'Medium',
-    'Tuition and Fees': 20000,
-    'Admission Rate': 50,
-    'Graduation Rate': 70,
-    'State': 'NY'
+    'BEA Region': 'New England (CT, ME, MA, NH, RI, VT)',
+    'State': 'Massachussets',
+    'Enrollment Size': 8000,
+    'SAT Reading and Writing': 800,
+    'SAT Math': 800
 }
 
-# Normalize user preferences if needed (for example, normalize tuition and fees)
-user_preferences['Tuition and Fees'] = user_preferences['Tuition and Fees'] / df['DRVIC2021.Tuition and fees, 2021-22'].max()
+# Filter out schools with NaN values in 'DRVEF2021.Full-time undergraduate enrollment'
+df = df.dropna(subset=['DRVEF2021.Full-time undergraduate enrollment'])
 
-# Calculate scores for each criterion
-df['Size_Score'] = (df['HD2021.Institution size category'] == user_preferences['Institution Size']).astype(int)
-df['Tuition_Score'] = 1 - abs(df['DRVIC2021.Tuition and fees, 2021-22'] - user_preferences['Tuition and Fees'])
-df['Admission_Score'] = 1 - abs(df['DRVADM2021_RV.Percent admitted - total'] - user_preferences['Admission Rate'])
-df['Graduation_Score'] = 1 - abs(df['DRVGR2021_RV.Graduation rate, total cohort'] - user_preferences['Graduation Rate'])
-df['State_Score'] = (df['HD2021.State abbreviation'] == user_preferences['State']).astype(int)
+# Filter rows where 'HD2021.Institutional category' matches the specified value
+df = df[df['HD2021.Institutional category'] == 'Degree-granting, primarily baccalaureate or above']
 
-# Calculate the total score
-df['Total_Score'] = df[['Size_Score', 'Tuition_Score', 'Admission_Score', 'Graduation_Score', 'State_Score']].sum(axis=1)
+# Define a function to calculate matching score for each criterion
+def calculate_score(value, user_preference, weight):
+    # Adjusted weighting algorithm to assign scores based on preferences
+    if user_preference == value:
+        return 100 * weight
+    else:
+        # Adjusted weighting algorithm for enrollment size using a linear approach
+        if user_preference == 'Enrollment Size':
+            try:
+                value = float(value)
+            except ValueError:
+                return 0  # Assign a score of 0 for non-numeric values
+            
+            # Calculate enrollment score using a linear approach
+            enrollment_score = max(0, 100 - 10 * abs(value - user_preferences['Enrollment Size']) / user_preferences['Enrollment Size'])
+            return enrollment_score * weight
+        elif user_preference == 'SAT Score':
+            try:
+                value = float(value)
+            except ValueError:
+                return 0  # Assign a score of 0 for non-numeric values
+            
+            # Calculate SAT score using a linear approach
+            sat_score = max(0, 100 - abs(value - user_preferences['SAT Reading and Writing']) - abs(value - user_preferences['SAT Math']))
+            return sat_score * weight
+        else:
+            return 0  # For other preferences, assign a score of 0
 
-# Normalize the total score to a percentage scale
-df['Percent_Match'] = (df['Total_Score'] / df['Total_Score'].max()) * 100
+# Calculate scores for each criterion in the DataFrame
+df['BEA_Region_Score'] = df['HD2021.Bureau of Economic Analysis (BEA) regions'].apply(lambda x: calculate_score(x, user_preferences['BEA Region'], 1))
+df['State_Score'] = df['HD2021.FIPS state code'].apply(lambda x: calculate_score(x, user_preferences['State'], 1))
+df['Enrollment_Score'] = df['DRVEF2021.Full-time undergraduate enrollment'].apply(lambda x: calculate_score(x, 'Enrollment Size', 1))
+df['SAT_Score'] = df[['ADM2021_RV.SAT Evidence-Based Reading and Writing 75th percentile score', 'ADM2021_RV.SAT Math 75th percentile score']].mean(axis=1).apply(lambda x: calculate_score(x, 'SAT Score', 1))
 
-# Display the top matching institutions
-top_matches = df.sort_values(by='Percent_Match', ascending=True).head(10)
-print(top_matches[['institution name', 'Percent_Match']])
+# Calculate the total score for the DataFrame
+total_weight = df[['BEA_Region_Score', 'State_Score', 'Enrollment_Score', 'SAT_Score']].sum(axis=1)
+total_score = total_weight / total_weight.max() * 100
+df['Percent_Match'] = total_score
+
+# Display the institutions sorted by match score in the DataFrame
+sorted_data = df.sort_values(by='Percent_Match', ascending=False)
+print(sorted_data[['institution name', 'Percent_Match']])
