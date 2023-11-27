@@ -132,7 +132,7 @@ def main():
     # CHANGE USER INPUT HERE !!
     user_preferences = {
         REGION_COLUMN: 'New England (CT, ME, MA, NH, RI, VT)',
-        STATE_COLUMN: 'Massachussets',
+        STATE_COLUMN: 'Massachusetts',
         ENROLLMENT_COLUMN: 8000,
         SAT_READING_COLUMN: 800,
         SAT_MATH_COLUMN: 800,
