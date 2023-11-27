@@ -1,66 +1,172 @@
 import pandas as pd
 
-# Load the CSV data
-csv_path = "college_data.csv"
-df = pd.read_csv(csv_path)
+# Constants
+CSV_PATH = "college_data.csv"
+ENROLLMENT_COLUMN = 'DRVEF2021.Full-time undergraduate enrollment'
+INSTITUTION_CATEGORY_COLUMN = 'HD2021.Institutional category'
+REGION_COLUMN = 'HD2021.Bureau of Economic Analysis (BEA) regions'
+STATE_COLUMN = 'HD2021.FIPS state code'
+SAT_READING_COLUMN = 'ADM2021_RV.SAT Evidence-Based Reading and Writing 75th percentile score'
+SAT_MATH_COLUMN = 'ADM2021_RV.SAT Math 75th percentile score'
+ACT_COLUMN = 'ADM2021_RV.ACT Composite 75th percentile score'
+CONTROL_COLUMN = 'HD2021.Control of institution'
+GRADUATION_RATE_COLUMN = 'DRVGR2021_RV.Graduation rate, total cohort'
+ADMISSIONS_COLUMN = 'DRVADM2021_RV.Percent admitted - total'
 
-#column names
-columns = {
-    'Region': 'HD2021.Bureau of Economic Analysis (BEA) regions',
-    'State': 'HD2021.FIPS state code',
-    'Enrollment': 'DRVEF2021.Full-time undergraduate enrollment',
-    'SAT Reading and Writing': 'ADM2021_RV.SAT Evidence-Based Reading and Writing 75th percentile score',  
-    'SAT Math': 'ADM2021_RV.SAT Math 75th percentile score'
-}
 
-# User preferences (example values, replace with user input)
-user_preferences = {
-    'Region': 'New England (CT, ME, MA, NH, RI, VT)',
-    'State': 'Massachussets',
-    'Enrollment': 8000,
-    'SAT Reading and Writing': 800,
-    'SAT Math': 800
-}
 
-# Filter out schools with NaN values in 'DRVEF2021.Full-time undergraduate enrollment'
-df = df.dropna(subset=['DRVEF2021.Full-time undergraduate enrollment'])
+# Read the csv file
+def load_data(csv_path):
+    return pd.read_csv(csv_path)
 
-# Filter rows where 'HD2021.Institutional category' matches the specified value
-df = df[df['HD2021.Institutional category'] == 'Degree-granting, primarily baccalaureate or above']
+# Drop schools without data, and that are not accreditaed 4-year schools
+def clean_data(df):
+    df = df.dropna(subset=[ENROLLMENT_COLUMN, INSTITUTION_CATEGORY_COLUMN, REGION_COLUMN, STATE_COLUMN, GRADUATION_RATE_COLUMN])
+    df = df[df[INSTITUTION_CATEGORY_COLUMN] == 'Degree-granting, primarily baccalaureate or above']
+    return df
 
-# Define three separate functions for each preference
 def string_match(value, user_preference, weight):
-    return 100 * weight if user_preference == value else 0
-
-def score_enrollment_size(value, weight):
     try:
-        value = float(value)
+        # Convert the value to a string to handle different data types
+        str_value = str(value)
+        return 100 * weight if user_preference == str_value else 0
+    except Exception as e:
+        print(f"Error processing value: {value} in string_match function. Error: {e}")
+        return 0
+
+def calculate_graduation_match(column, weight, user_preference):
+    try:
+        # Convert graduation rate column to float
+        column = column.astype(float)
+        user_preference = float(user_preference)
+
+        # Calculate match scores based on the provided equation
+        match_scores = column.apply(lambda x: max(0, 100 - 100 * abs(x - user_preference) / (user_preference)))
+        normalized_scores = ((match_scores - match_scores.min()) / (match_scores.max() - match_scores.min())) * 100
+
+        # Return the total match score, multiplied by the weight
+        return normalized_scores * weight
     except ValueError:
         return 0
 
-    enrollment_score = max(0, 100 - 10 * abs(value - user_preferences['Enrollment']) / user_preferences['Enrollment'])
-    return enrollment_score * weight
-
-def score_sat(value, weight):
+def calculate_admissions_match(column, weight, user_preference):
     try:
-        value = float(value)
+        # Convert graduation rate column to float
+        column = column.astype(float)
+        user_preference = float(user_preference)
+
+        # Create a match score where it classifies it as a 100% match if falls in the range
+        match_score = column.apply(lambda x: 100 if user_preference - 10 <= x < user_preference + 10 else 0)
+
+        # Return the binary match scores, multiplied by the weight
+        return match_score * weight
     except ValueError:
         return 0
 
-    sat_score = max(0, 100 - abs(value - user_preferences['SAT Reading and Writing']) - abs(value - user_preferences['SAT Math']))
-    return sat_score * weight
 
-# Calculate scores for each criterion in the DataFrame
-df['BEA_Region_Score'] = df[columns['Region']].apply(lambda x: string_match(x, user_preferences['Region'], 1))
-df['State_Score'] = df[columns['State']].apply(lambda x: string_match(x, user_preferences['State'], 1))
-df['Enrollment_Score'] = df[columns['Enrollment']].apply(lambda x: score_enrollment_size(x, 1))
-df['SAT_Score'] = df[['ADM2021_RV.SAT Evidence-Based Reading and Writing 75th percentile score', 'ADM2021_RV.SAT Math 75th percentile score']].mean(axis=1).apply(lambda x: score_sat(x, 1))
+def calculate_enrollment_match(column, weight, user_preference):
+    try:
+        # Convert graduation rate column to float
+        column = column.astype(float)
+        user_preference = float(user_preference)
 
-# Calculate the total score for the DataFrame
-total_weight = df[['BEA_Region_Score', 'State_Score', 'Enrollment_Score', 'SAT_Score']].sum(axis=1)
-total_score = total_weight / total_weight.max() * 100
-df['Percent_Match'] = total_score
+        # Calculate match scores based on the provided equation
+        match_scores = 100 - 20 * abs(column - user_preference) / user_preference
+        normalized_scores = ((match_scores - match_scores.min()) / (match_scores.max() - match_scores.min())) * 100
 
-# Display the institutions sorted by match score in the DataFrame
-sorted_data = df.sort_values(by='Percent_Match', ascending=False)
-print(sorted_data[['institution name', 'Percent_Match']])
+        # Print the match scores
+        print("Match Scores!!:", normalized_scores)
+
+        # Return the total match score, multiplied by the weight
+        return normalized_scores * weight
+    except ValueError:
+        return 0
+
+def calculate_sat_match(df, weight, user_preference):
+    # Linear algorithm to determine sat reading match score
+    sat_rw_match = df[SAT_READING_COLUMN].dropna().astype(float).apply(lambda x: max(0, 100 - abs(x - user_preference)))
+
+    # Linear algorithm to determine sat math match score
+    sat_math_match = df[SAT_MATH_COLUMN].dropna().astype(float).apply(lambda x: max(0, 100 - abs(x - user_preference)))
+
+    # Combine scores with weights
+    sat_match = (sat_rw_match + sat_math_match) / 2 
+    return sat_match * weight / 2
+
+def calculate_act_match(df, weight, user_preference):
+    # Linear algorithm to determine act match score
+    act_match = df[ACT_COLUMN].dropna().astype(float).apply(lambda x: max(0, 100 - abs(x - user_preference)))
+    return act_match * weight
+
+
+
+
+def calculate_total_match(df, weights, preferences):
+    score_columns = pd.DataFrame()
+
+    for column, weight in weights.items():
+        if column == ENROLLMENT_COLUMN:
+            score_columns[column] = calculate_enrollment_match(df[column], weight, preferences[column])
+        elif column == SAT_READING_COLUMN or column == SAT_MATH_COLUMN:
+            score_columns[column] = calculate_sat_match(df, weight, preferences[column])
+        elif column == ACT_COLUMN:
+            score_columns[column] = calculate_act_match(df, weight, preferences[column])
+        elif column == GRADUATION_RATE_COLUMN:
+            score_columns[column] = calculate_graduation_match(df[column], weight, preferences[column])
+        elif column == ADMISSIONS_COLUMN:
+            score_columns[column] = calculate_admissions_match(df[column], weight, preferences[column])
+        else:
+            score_columns[column] = df[column].apply(lambda x: string_match(x, preferences[column], weight))
+
+    print(score_columns)
+    total_weight = score_columns.sum(axis=1)
+    total_score = total_weight / total_weight.max() * 100
+    return total_score
+
+
+def main():
+    # Load data
+    df = load_data(CSV_PATH)
+
+    # Clean data
+    df = clean_data(df)
+
+    # CHANGE USER INPUT HERE !!
+    user_preferences = {
+        REGION_COLUMN: 'New England (CT, ME, MA, NH, RI, VT)',
+        STATE_COLUMN: 'Massachussets',
+        ENROLLMENT_COLUMN: 8000,
+        SAT_READING_COLUMN: 800,
+        SAT_MATH_COLUMN: 800,
+        ACT_COLUMN: 0,
+        CONTROL_COLUMN: 'Private not-for-profit',
+        GRADUATION_RATE_COLUMN: 100,
+        ADMISSIONS_COLUMN: 10
+        
+    }
+
+    # Define weights for each criterion
+    weights = {
+        REGION_COLUMN: 1,
+        STATE_COLUMN: 1,
+        ENROLLMENT_COLUMN: 1,
+        SAT_READING_COLUMN: 1,
+        SAT_MATH_COLUMN: 1,
+        ACT_COLUMN: 0,
+        CONTROL_COLUMN: 1,
+        GRADUATION_RATE_COLUMN: 1,
+        ADMISSIONS_COLUMN: 1
+    }
+
+    # Calculate scores for each criterion in the DataFrame
+    total_score = calculate_total_match(df, weights, user_preferences)
+
+    # Add scores to DataFrame
+    df['Percent_Match'] = total_score
+
+    # Display the institutions sorted by match score in the DataFrame
+    sorted_data = df.sort_values(by='Percent_Match', ascending=False)
+    print(sorted_data[['institution name', 'Percent_Match']])
+
+if __name__ == "__main__":
+    main()
