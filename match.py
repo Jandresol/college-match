@@ -13,8 +13,6 @@ CONTROL_COLUMN = 'HD2021.Control of institution'
 GRADUATION_RATE_COLUMN = 'DRVGR2021_RV.Graduation rate, total cohort'
 ADMISSIONS_COLUMN = 'DRVADM2021_RV.Percent admitted - total'
 
-
-
 # Read the csv file
 def load_data(csv_path):
     return pd.read_csv(csv_path)
