@@ -23,6 +23,7 @@ def load_data(csv_path):
 # Drop schools without data, and that are not accreditaed 4-year schools
 def clean_data(df):
     df = df.dropna(subset=[ENROLLMENT_COLUMN, INSTITUTION_CATEGORY_COLUMN, REGION_COLUMN, STATE_COLUMN, GRADUATION_RATE_COLUMN])
+    df = df[(df[REGION_COLUMN] != 'U.S. Service schools') & (~df[REGION_COLUMN].isna())]
     df = df[df[INSTITUTION_CATEGORY_COLUMN] == 'Degree-granting, primarily baccalaureate or above']
     return df
 
@@ -136,7 +137,6 @@ def calculate_total_match(df, weights, preferences):
     total_weight = score_columns.sum(axis=1)
     total_score = total_weight / total_weight.max() * 100
     return total_score
-
 
 def main():
     # Load data

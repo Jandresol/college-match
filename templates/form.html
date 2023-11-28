@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Match Form</title>
+</head>
+<body>
+    <h1>College Match Form</h1>
+
+    <form action="/results" method="post">
+        <label for="region">Region:</label>
+        <select name="region">
+            {% for region_value in region_values %}
+                <option value="{{ region_value }}">{{ region_value }}</option>
+            {% endfor %}
+        </select><br>
+        
+        <label for="state">State:</label>
+        <select name="state">
+            {% for state_value in state_values %}
+                <option value="{{ state_value }}">{{ state_value }}</option>
+            {% endfor %}
+        </select><br>
+
+        <label for="enrollment">Enrollment:</label>
+        <input type="number" name="enrollment"><br>
+
+        <label for="sat_reading">SAT Reading:</label>
+        <input type="number" name="sat_reading"><br>
+
+        <label for="sat_math">SAT Math:</label>
+        <input type="number" name="sat_math"><br>
+
+        <label for="act">ACT:</label>
+        <input type="number" name="act"><br>
+
+        <label for="control">Control:</label>
+        <input type="text" name="control"><br>
+
+        <label for="graduation_rate">Graduation Rate:</label>
+        <input type="number" name="graduation_rate"><br>
+
+        <label for="admissions">Admissions:</label>
+        <input type="number" name="admissions"><br>
+
+        <label for="urbanization">Urbanization:</label>
+        <input type="text" name="urbanization"><br>
+
+        <label for="net_price_public">Net Price Public:</label>
+        <input type="number" name="net_price_public"><br>
+
+        <label for="net_price_private">Net Price Private:</label>
+        <input type="number" name="net_price_private"><br>
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>
