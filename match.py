@@ -12,6 +12,9 @@ ACT_COLUMN = 'ADM2021_RV.ACT Composite 75th percentile score'
 CONTROL_COLUMN = 'HD2021.Control of institution'
 GRADUATION_RATE_COLUMN = 'DRVGR2021_RV.Graduation rate, total cohort'
 ADMISSIONS_COLUMN = 'DRVADM2021_RV.Percent admitted - total'
+URBANIZATION_COLUMN = 'HD2021.Degree of urbanization (Urban-centric locale)'
+NET_PRICE_PUBLIC_COLUMN = 'SFA2021_RV.Average net price-students awarded grant or scholarship aid, 2020-21 Public'
+NET_PRICE_PRIVATE_COLUMN = 'SFA2021_RV.Average net price-students awarded grant or scholarship aid, 2020-21 Private'
 
 # Read the csv file
 def load_data(csv_path):
@@ -27,9 +30,8 @@ def string_match(value, user_preference, weight):
     try:
         # Convert the value to a string to handle different data types
         str_value = str(value)
-        return 100 * weight if user_preference == str_value else 0
+        return 100 * weight if user_preference in str_value else 0
     except Exception as e:
-        print(f"Error processing value: {value} in string_match function. Error: {e}")
         return 0
 
 def calculate_graduation_match(column, weight, user_preference):
@@ -72,8 +74,20 @@ def calculate_enrollment_match(column, weight, user_preference):
         match_scores = 100 - 20 * abs(column - user_preference) / user_preference
         normalized_scores = ((match_scores - match_scores.min()) / (match_scores.max() - match_scores.min())) * 100
 
-        # Print the match scores
-        print("Match Scores!!:", normalized_scores)
+        # Return the total match score, multiplied by the weight
+        return normalized_scores * weight
+    except ValueError:
+        return 0
+
+def calculate_price_match(column, weight, user_preference):
+    try:
+        # Convert graduation rate column to float
+        column = column.astype(float)
+        user_preference = float(user_preference)
+
+        # Calculate match scores based on the provided equation
+        match_scores = 100 - 20 * abs(column - user_preference) / user_preference
+        normalized_scores = ((match_scores - match_scores.min()) / (match_scores.max() - match_scores.min())) * 100
 
         # Return the total match score, multiplied by the weight
         return normalized_scores * weight
@@ -113,10 +127,12 @@ def calculate_total_match(df, weights, preferences):
             score_columns[column] = calculate_graduation_match(df[column], weight, preferences[column])
         elif column == ADMISSIONS_COLUMN:
             score_columns[column] = calculate_admissions_match(df[column], weight, preferences[column])
+        elif column == NET_PRICE_PUBLIC_COLUMN or column == NET_PRICE_PRIVATE_COLUMN:
+            combined_net_price = df[NET_PRICE_PUBLIC_COLUMN].fillna(0) + df[NET_PRICE_PRIVATE_COLUMN].fillna(0)
+            score_columns[column] = calculate_price_match(combined_net_price, weight, preferences[column])
         else:
             score_columns[column] = df[column].apply(lambda x: string_match(x, preferences[column], weight))
 
-    print(score_columns)
     total_weight = score_columns.sum(axis=1)
     total_score = total_weight / total_weight.max() * 100
     return total_score
@@ -131,15 +147,18 @@ def main():
 
     # CHANGE USER INPUT HERE !!
     user_preferences = {
-        REGION_COLUMN: 'New England (CT, ME, MA, NH, RI, VT)',
-        STATE_COLUMN: 'Massachusetts',
-        ENROLLMENT_COLUMN: 8000,
-        SAT_READING_COLUMN: 800,
-        SAT_MATH_COLUMN: 800,
+        REGION_COLUMN: 'Great Lakes (IL, IN, MI, OH, WI)',
+        STATE_COLUMN: 'Ohio',
+        ENROLLMENT_COLUMN: 3000,
+        SAT_READING_COLUMN: 670,
+        SAT_MATH_COLUMN: 670,
         ACT_COLUMN: 0,
         CONTROL_COLUMN: 'Private not-for-profit',
-        GRADUATION_RATE_COLUMN: 100,
-        ADMISSIONS_COLUMN: 10
+        GRADUATION_RATE_COLUMN: 70,
+        ADMISSIONS_COLUMN: 90,
+        URBANIZATION_COLUMN: 'City',
+        NET_PRICE_PUBLIC_COLUMN: 20000,
+        NET_PRICE_PRIVATE_COLUMN: 20000
         
     }
 
@@ -150,10 +169,13 @@ def main():
         ENROLLMENT_COLUMN: 1,
         SAT_READING_COLUMN: 1,
         SAT_MATH_COLUMN: 1,
-        ACT_COLUMN: 0,
+        ACT_COLUMN: 1,
         CONTROL_COLUMN: 1,
         GRADUATION_RATE_COLUMN: 1,
-        ADMISSIONS_COLUMN: 1
+        ADMISSIONS_COLUMN: 1,
+        URBANIZATION_COLUMN: 1,
+        NET_PRICE_PUBLIC_COLUMN: 0,
+        NET_PRICE_PRIVATE_COLUMN: 0
     }
 
     # Calculate scores for each criterion in the DataFrame
