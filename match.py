@@ -15,6 +15,7 @@ ADMISSIONS_COLUMN = 'DRVADM2021_RV.Percent admitted - total'
 URBANIZATION_COLUMN = 'HD2021.Degree of urbanization (Urban-centric locale)'
 NET_PRICE_PUBLIC_COLUMN = 'SFA2021_RV.Average net price-students awarded grant or scholarship aid, 2020-21 Public'
 NET_PRICE_PRIVATE_COLUMN = 'SFA2021_RV.Average net price-students awarded grant or scholarship aid, 2020-21 Private'
+NET_PRICE_COLUMN = 'Combined Net Price'
 
 # Read the csv file
 def load_data(csv_path):
@@ -25,6 +26,7 @@ def clean_data(df):
     df = df.dropna(subset=[ENROLLMENT_COLUMN, INSTITUTION_CATEGORY_COLUMN, REGION_COLUMN, STATE_COLUMN, GRADUATION_RATE_COLUMN])
     df = df[(df[REGION_COLUMN] != 'U.S. Service schools') & (~df[REGION_COLUMN].isna())]
     df = df[df[INSTITUTION_CATEGORY_COLUMN] == 'Degree-granting, primarily baccalaureate or above']
+    df['Combined Net Price'] = df[NET_PRICE_PUBLIC_COLUMN].fillna(0) + df[NET_PRICE_PRIVATE_COLUMN].fillna(0)
     return df
 
 def string_match(value, user_preference, weight):
@@ -41,9 +43,12 @@ def calculate_graduation_match(column, weight, user_preference):
         column = column.astype(float)
         user_preference = float(user_preference)
 
+        # Handle the case where user_preference is 0 to avoid division by zero
+        denominator = max(1, user_preference)
+        
         # Calculate match scores based on the provided equation
-        match_scores = column.apply(lambda x: max(0, 100 - 100 * abs(x - user_preference) / (user_preference)))
-        normalized_scores = ((match_scores - match_scores.min()) / (match_scores.max() - match_scores.min())) * 100
+        match_scores = column.apply(lambda x: max(0, 100 - 100 * abs(x - user_preference) / denominator))
+        normalized_scores = ((match_scores - match_scores.min()) / max(1, (match_scores.max() - match_scores.min()))) * 100
 
         # Return the total match score, multiplied by the weight
         return normalized_scores * weight
@@ -56,7 +61,7 @@ def calculate_admissions_match(column, weight, user_preference):
         column = column.astype(float)
         user_preference = float(user_preference)
 
-        # Create a match score where it classifies it as a 100% match if falls in the range
+        # Create a match score where it classifies it as a 100% match if it falls in the range
         match_score = column.apply(lambda x: 100 if user_preference - 10 <= x < user_preference + 10 else 0)
 
         # Return the binary match scores, multiplied by the weight
@@ -71,9 +76,12 @@ def calculate_enrollment_match(column, weight, user_preference):
         column = column.astype(float)
         user_preference = float(user_preference)
 
+        # Handle the case where user_preference is 0 to avoid division by zero
+        denominator = max(1, user_preference)
+        
         # Calculate match scores based on the provided equation
-        match_scores = 100 - 20 * abs(column - user_preference) / user_preference
-        normalized_scores = ((match_scores - match_scores.min()) / (match_scores.max() - match_scores.min())) * 100
+        match_scores = 100 - 20 * abs(column - user_preference) / denominator
+        normalized_scores = ((match_scores - match_scores.min()) / max(1, (match_scores.max() - match_scores.min()))) * 100
 
         # Return the total match score, multiplied by the weight
         return normalized_scores * weight
@@ -82,13 +90,16 @@ def calculate_enrollment_match(column, weight, user_preference):
 
 def calculate_price_match(column, weight, user_preference):
     try:
-        # Convert graduation rate column to float
+        # Convert the column to float
         column = column.astype(float)
         user_preference = float(user_preference)
 
+        # Handle the case where user_preference is 0 to avoid division by zero
+        denominator = max(1, user_preference)
+        
         # Calculate match scores based on the provided equation
-        match_scores = 100 - 20 * abs(column - user_preference) / user_preference
-        normalized_scores = ((match_scores - match_scores.min()) / (match_scores.max() - match_scores.min())) * 100
+        match_scores = 100 - 20 * abs(column - user_preference) / denominator
+        normalized_scores = ((match_scores - match_scores.min()) / max(1, (match_scores.max() - match_scores.min()))) * 100
 
         # Return the total match score, multiplied by the weight
         return normalized_scores * weight
@@ -112,11 +123,8 @@ def calculate_act_match(df, weight, user_preference):
     return act_match * weight
 
 
-
-
 def calculate_total_match(df, weights, preferences):
     score_columns = pd.DataFrame()
-
     for column, weight in weights.items():
         if column == ENROLLMENT_COLUMN:
             score_columns[column] = calculate_enrollment_match(df[column], weight, preferences[column])
@@ -128,9 +136,8 @@ def calculate_total_match(df, weights, preferences):
             score_columns[column] = calculate_graduation_match(df[column], weight, preferences[column])
         elif column == ADMISSIONS_COLUMN:
             score_columns[column] = calculate_admissions_match(df[column], weight, preferences[column])
-        elif column == NET_PRICE_PUBLIC_COLUMN or column == NET_PRICE_PRIVATE_COLUMN:
-            combined_net_price = df[NET_PRICE_PUBLIC_COLUMN].fillna(0) + df[NET_PRICE_PRIVATE_COLUMN].fillna(0)
-            score_columns[column] = calculate_price_match(combined_net_price, weight, preferences[column])
+        elif column == NET_PRICE_COLUMN: 
+            score_columns[column] = calculate_price_match(df[NET_PRICE_COLUMN], weight, preferences[column])
         else:
             score_columns[column] = df[column].apply(lambda x: string_match(x, preferences[column], weight))
 
@@ -148,17 +155,16 @@ def main():
     # CHANGE USER INPUT HERE !!
     user_preferences = {
         REGION_COLUMN: 'Great Lakes (IL, IN, MI, OH, WI)',
-        STATE_COLUMN: 'Ohio',
-        ENROLLMENT_COLUMN: 3000,
+        STATE_COLUMN: '',
+        ENROLLMENT_COLUMN: 30000,
         SAT_READING_COLUMN: 670,
         SAT_MATH_COLUMN: 670,
         ACT_COLUMN: 0,
-        CONTROL_COLUMN: 'Private not-for-profit',
+        CONTROL_COLUMN: 'Private',
         GRADUATION_RATE_COLUMN: 70,
         ADMISSIONS_COLUMN: 90,
         URBANIZATION_COLUMN: 'City',
-        NET_PRICE_PUBLIC_COLUMN: 20000,
-        NET_PRICE_PRIVATE_COLUMN: 20000
+        NET_PRICE_COLUMN: 200000
         
     }
 
@@ -166,16 +172,15 @@ def main():
     weights = {
         REGION_COLUMN: 1,
         STATE_COLUMN: 1,
-        ENROLLMENT_COLUMN: 1,
+        ENROLLMENT_COLUMN:1,
         SAT_READING_COLUMN: 1,
         SAT_MATH_COLUMN: 1,
-        ACT_COLUMN: 1,
+        ACT_COLUMN: 0,
         CONTROL_COLUMN: 1,
         GRADUATION_RATE_COLUMN: 1,
         ADMISSIONS_COLUMN: 1,
         URBANIZATION_COLUMN: 1,
-        NET_PRICE_PUBLIC_COLUMN: 0,
-        NET_PRICE_PRIVATE_COLUMN: 0
+        NET_PRICE_COLUMN: 1
     }
 
     # Calculate scores for each criterion in the DataFrame

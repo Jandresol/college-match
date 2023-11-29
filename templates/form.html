@@ -11,6 +11,7 @@
     <form action="/results" method="post">
         <label for="region">Region:</label>
         <select name="region">
+            <option value=""></option>
             {% for region_value in region_values %}
                 <option value="{{ region_value }}">{{ region_value }}</option>
             {% endfor %}
@@ -18,6 +19,7 @@
         
         <label for="state">State:</label>
         <select name="state">
+            <option value=""></option>
             {% for state_value in state_values %}
                 <option value="{{ state_value }}">{{ state_value }}</option>
             {% endfor %}
@@ -36,7 +38,11 @@
         <input type="number" name="act"><br>
 
         <label for="control">Control:</label>
-        <input type="text" name="control"><br>
+        <select name="control">
+            <option value=""></option>
+            <option value="Public">Public</option>
+            <option value="Private">Private</option>
+        </select><br>
 
         <label for="graduation_rate">Graduation Rate:</label>
         <input type="number" name="graduation_rate"><br>
@@ -45,13 +51,16 @@
         <input type="number" name="admissions"><br>
 
         <label for="urbanization">Urbanization:</label>
-        <input type="text" name="urbanization"><br>
+        <select name="urbanization">
+            <option value=""></option>
+            <option value="City">City</option>
+            <option value="Suburb">Suburb</option>
+            <option value="Town">Town</option>
+            <option value="Rural">Rural</option>
+        </select><br>
 
-        <label for="net_price_public">Net Price Public:</label>
-        <input type="number" name="net_price_public"><br>
-
-        <label for="net_price_private">Net Price Private:</label>
-        <input type="number" name="net_price_private"><br>
+        <label for="net_price">Net Price:</label>
+        <input type="number" name="net_price"><br>
 
         <input type="submit" value="Submit">
     </form>

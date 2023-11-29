@@ -2,19 +2,12 @@ from flask import Flask, render_template, request
 from match import (
     load_data,
     clean_data,
-    string_match,
-    calculate_graduation_match,
-    calculate_admissions_match,
-    calculate_enrollment_match,
-    calculate_price_match,
-    calculate_sat_match,
-    calculate_act_match,
     calculate_total_match
 )
 
 app = Flask(__name__)
 
-# Constants
+# CSV Columns
 CSV_PATH = "college_data.csv"
 ENROLLMENT_COLUMN = 'DRVEF2021.Full-time undergraduate enrollment'
 INSTITUTION_CATEGORY_COLUMN = 'HD2021.Institutional category'
@@ -29,6 +22,7 @@ ADMISSIONS_COLUMN = 'DRVADM2021_RV.Percent admitted - total'
 URBANIZATION_COLUMN = 'HD2021.Degree of urbanization (Urban-centric locale)'
 NET_PRICE_PUBLIC_COLUMN = 'SFA2021_RV.Average net price-students awarded grant or scholarship aid, 2020-21 Public'
 NET_PRICE_PRIVATE_COLUMN = 'SFA2021_RV.Average net price-students awarded grant or scholarship aid, 2020-21 Private'
+NET_PRICE_COLUMN = 'Combined Net Price'
 
 @app.route('/')
 def college_match_form():
@@ -44,58 +38,66 @@ def college_match_form():
     # Get unique state values
     state_values = df[STATE_COLUMN].unique().tolist()
     
-    return render_template('form.html', region_values=region_values, state_values=state_values)
+    # Get unique control values
+    control_values = df[CONTROL_COLUMN].unique().tolist()
+    
+    # Get unique urbanization values
+    urban_values = df[URBANIZATION_COLUMN].unique().tolist()
+
+    return render_template('form.html', region_values=region_values, state_values=state_values, control_values=control_values, urban_values=urban_values)
 
 @app.route('/results', methods=['POST'])
 def display_results():
-    # Load data
-    df = load_data(CSV_PATH)
+    try:
+        # Retrieve user input from the form
+        user_preferences = {
+            REGION_COLUMN: request.form.get('region') or 0,  
+            STATE_COLUMN: request.form.get('state') or 0, 
+            ENROLLMENT_COLUMN: int(request.form.get('enrollment') or 0),
+            SAT_READING_COLUMN: int(request.form.get('sat_reading') or 0),
+            SAT_MATH_COLUMN: int(request.form.get('sat_math') or 0),
+            ACT_COLUMN: int(request.form.get('act') or 0),
+            CONTROL_COLUMN: request.form.get('control') or 0,
+            GRADUATION_RATE_COLUMN: int(request.form.get('graduation_rate') or 0),
+            ADMISSIONS_COLUMN: int(request.form.get('admissions') or 0),
+            URBANIZATION_COLUMN: request.form.get('urbanization') or 0, 
+            NET_PRICE_COLUMN: int(request.form.get('net_price') or 0),
+        }
 
-    # Clean data
-    df = clean_data(df)
-    
-    # Static user preferences
-    user_preferences = {
-        REGION_COLUMN: 'Great Lakes (IL, IN, MI, OH, WI)',
-        STATE_COLUMN: 'Ohio',
-        ENROLLMENT_COLUMN: 3000,
-        SAT_READING_COLUMN: 670,
-        SAT_MATH_COLUMN: 670,
-        ACT_COLUMN: 0,
-        CONTROL_COLUMN: 'Private not-for-profit',
-        GRADUATION_RATE_COLUMN: 70,
-        ADMISSIONS_COLUMN: 90,
-        URBANIZATION_COLUMN: 'City',
-        NET_PRICE_PUBLIC_COLUMN: 20000,
-        NET_PRICE_PRIVATE_COLUMN: 20000
-    }
+        # Load data
+        df = load_data(CSV_PATH)
 
-    # Define weights for each criterion
-    weights = {
-        REGION_COLUMN: 1,
-        STATE_COLUMN: 1,
-        ENROLLMENT_COLUMN: 1,
-        SAT_READING_COLUMN: 1,
-        SAT_MATH_COLUMN: 1,
-        ACT_COLUMN: 1,
-        CONTROL_COLUMN: 1,
-        GRADUATION_RATE_COLUMN: 1,
-        ADMISSIONS_COLUMN: 1,
-        URBANIZATION_COLUMN: 1,
-        NET_PRICE_PUBLIC_COLUMN: 0,
-        NET_PRICE_PRIVATE_COLUMN: 0
-    }
-    # Calculate scores for each criterion in the DataFrame
-    total_score = calculate_total_match(df, weights, user_preferences)
+        # Clean data
+        df = clean_data(df)
 
-    # Add scores to DataFrame
-    df['Percent_Match'] = total_score
+        # Define weights for each criterion
+        weights = {
+            REGION_COLUMN: 1,
+            STATE_COLUMN: 1,
+            ENROLLMENT_COLUMN: 1,
+            SAT_READING_COLUMN: .5,
+            SAT_MATH_COLUMN: .5,
+            ACT_COLUMN: 1,
+            CONTROL_COLUMN: 1,
+            GRADUATION_RATE_COLUMN: 1,
+            ADMISSIONS_COLUMN: 1,
+            URBANIZATION_COLUMN: 1,
+            NET_PRICE_COLUMN: 1,
+        }
 
-    # Display the institutions sorted by match score in the DataFrame
-    sorted_data = df.sort_values(by='Percent_Match', ascending=False)
-    results_html = sorted_data[['institution name', 'Percent_Match']].to_html(index=False)
+        # Calculate scores for each criterion in the DataFrame
+        total_score = calculate_total_match(df, weights, user_preferences)
 
-    return render_template('results.html', results_html=results_html)
+        # Add scores to DataFrame
+        df['Percent_Match'] = total_score
+
+        # Display the institutions sorted by match score in the DataFrame
+        sorted_data = df.sort_values(by='Percent_Match', ascending=False)
+        results_html = sorted_data[['institution name', 'Percent_Match']].to_html(index=False)
+
+        return render_template('results.html', results_html=results_html)
+    except Exception as e:
+        return render_template('error.html', error=str(e))
 
 if __name__ == '__main__':
     app.run(debug=True)
