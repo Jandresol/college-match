@@ -154,17 +154,17 @@ def main():
 
     # CHANGE USER INPUT HERE !!
     user_preferences = {
-        REGION_COLUMN: 'Great Lakes (IL, IN, MI, OH, WI)',
+        REGION_COLUMN: '',
         STATE_COLUMN: '',
-        ENROLLMENT_COLUMN: 30000,
-        SAT_READING_COLUMN: 670,
-        SAT_MATH_COLUMN: 670,
+        ENROLLMENT_COLUMN: 0,
+        SAT_READING_COLUMN: 0,
+        SAT_MATH_COLUMN: 0,
         ACT_COLUMN: 0,
-        CONTROL_COLUMN: 'Private',
-        GRADUATION_RATE_COLUMN: 70,
-        ADMISSIONS_COLUMN: 90,
-        URBANIZATION_COLUMN: 'City',
-        NET_PRICE_COLUMN: 200000
+        CONTROL_COLUMN: '',
+        GRADUATION_RATE_COLUMN: 0,
+        ADMISSIONS_COLUMN: 0,
+        URBANIZATION_COLUMN: '',
+        NET_PRICE_COLUMN: 0
         
     }
 
@@ -175,7 +175,7 @@ def main():
         ENROLLMENT_COLUMN:1,
         SAT_READING_COLUMN: 1,
         SAT_MATH_COLUMN: 1,
-        ACT_COLUMN: 0,
+        ACT_COLUMN: 1,
         CONTROL_COLUMN: 1,
         GRADUATION_RATE_COLUMN: 1,
         ADMISSIONS_COLUMN: 1,
