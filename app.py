@@ -10,9 +10,6 @@ SIZE_COLUMN = 'HD2021.Institution size category'
 INSTITUTION_CATEGORY_COLUMN = 'HD2021.Institutional category'
 REGION_COLUMN = 'HD2021.Bureau of Economic Analysis (BEA) regions'
 STATE_COLUMN = 'HD2021.FIPS state code'
-SAT_READING_COLUMN = 'ADM2021_RV.SAT Evidence-Based Reading and Writing 75th percentile score'
-SAT_MATH_COLUMN = 'ADM2021_RV.SAT Math 75th percentile score'
-ACT_COLUMN = 'ADM2021_RV.ACT Composite 75th percentile score'
 CONTROL_COLUMN = 'HD2021.Control of institution'
 GRADUATION_RATE_COLUMN = 'DRVGR2021_RV.Graduation rate, total cohort'
 ADMISSIONS_COLUMN = 'DRVADM2021_RV.Percent admitted - total'
@@ -63,18 +60,22 @@ def index():
 
 @app.route('/restart', methods=['POST'])
 def restart():
-    # Clear the session
-    session.clear()
+    # Clear specific form-related session variables
+    for field in form_fields:
+        session.pop(field, None)
+
     # Redirect to the beginning of the form
     return redirect(url_for('index'))
 
 
 @app.route('/step/<int:step>', methods=['GET', 'POST'])
+# Create pages for every question
 def step(step):
     if request.method == 'POST':
         for field in form_fields:
             value = request.form.get(field, '').strip()
             session[field] = value if value else session.get(field, 0)
+            print(value)
 
         if step < len(questions):
             # Redirect to the next step
