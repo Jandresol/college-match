@@ -3,14 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Match Results</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Results</title>
+    <style>
+        tbody tr:hover {
+            background-color: #f5f5f5; /* Change the background color on hover */
+        }
+    </style>
 </head>
 <body>
-    <h1>College Match Results</h1>
-    {{ results_html|safe }}
 
+<div class="container mt-4">
+    <h2>Top 10 Matching Institutions</h2>
+    
+    <div class="table-responsive">
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Institution Name</th>
+                    <th>Percent Match</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for index, row in top_ten_data.iterrows() %}
+                    <tr>
+                        <td>{{ row['institution name'] }}</td>
+                        <td>{{ row['Percent_Match']|round|int }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     <form action="{{ url_for('restart') }}" method="post">
-        <input type="submit" value="Restart">
+        <button type="submit" class="btn btn-primary">Restart</button>
     </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
 </body>
 </html>

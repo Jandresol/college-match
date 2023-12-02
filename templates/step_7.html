@@ -1,16 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Match Form - Step 7</title>
-</head>
-<body>
-    <h1>Step 7: Select Urbanization</h1>
+{% extends 'base.html' %}
 
-    <form action="{{ url_for('step', step=7) }}" method="post">
-        <label for="{{ form_fields[6] }}">Urbanization:</label>
-        <select name="{{ form_fields[6] }}">
+{% block title %}Step 7: Select Urbanization{% endblock %}
+
+{% block content %}
+    <h1 class="text-center mt-4 mb-4">Step 7: Select Urbanization</h1>
+
+    <form action="{{ url_for('step', step=7) }}" method="post" class="text-center">
+        <label for="{{ form_fields[6] }}"></label>
+        <select name="{{ form_fields[6] }}" class="js-example-basic-single" style="width: 100%;">
             <option value=""></option>
             <option value="City">City</option>
             <option value="Suburb">Suburb</option>
@@ -19,12 +16,17 @@
         </select><br>
 
 
-        <input type="submit" value="Next">
+        <button type="submit" class="btn btn-primary mt-3">Next</button>
     </form>
 
-    <form action="{{ url_for('step', step=6) }}" method="get">
-        <input type="submit" value="Back">
+    <form action="{{ url_for('step', step=6) }}" method="get" class="text-center">
+        <button type="submit" class="btn btn-primary mt-3">Back</button>
     </form>
+    <script>
+        // Initialize Select2 on the select element
+        $(document).ready(function() {
+            $('.js-example-basic-single').select2();
+        });
+    </script>
+{% endblock %}
 
-</body>
-</html>

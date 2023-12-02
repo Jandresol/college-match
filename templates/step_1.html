@@ -1,24 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Match Form - Step 1</title>
-</head>
-<body>
-    <h1>Step 1: Select Region</h1>
+{% extends 'base.html' %}
 
-    <form action="{{ url_for('step', step=1) }}" method="post">
-        <label for="{{ form_fields[0] }}">Select your region:</label>
-        <select name="{{ form_fields[0] }}">
+{% block title %}Step 1: Select Region{% endblock %}
+
+{% block content %}
+    <h1 class="text-center mt-4 mb-4">Step 1: Select Region</h1>
+
+    <form action="{{ url_for('step', step=1) }}" method="post" class="text-center">
+        <label for="{{ form_fields[0] }}"></label>
+        <select name="{{ form_fields[0] }}" class="js-example-basic-single form-select" style="width: 100%;">
             <option value=""></option>
             {% for region_value in region_values %}
                 <option value="{{ region_value }}">{{ region_value }}</option>
             {% endfor %}
         </select><br>
     
-        <input type="submit" value="Next">
+        <button type="submit" class="btn btn-primary mt-3">Next</button>
     </form>
-    
-</body>
-</html>
+
+    <script>
+        // Initialize Select2 on the select element
+        $(document).ready(function() {
+            $('.js-example-basic-single').select2();
+        });
+    </script>
+{% endblock %}

@@ -1,27 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Match Form - Step 4</title>
-</head>
-<body>
-    <h1>Step 4: Public or Private?</h1>
+{% extends 'base.html' %}
 
-    <form action="{{ url_for('step', step=4) }}" method="post">
-        <label for="{{ form_fields[3] }}">Control:</label>
-        <select name="{{ form_fields[3] }}">
+{% block title %}Step 4: Public or Private?{% endblock %}
+
+{% block content %}
+<body>
+    <h1 class="text-center mt-4 mb-4">Step 4: School type?</h1>
+
+    <form action="{{ url_for('step', step=4) }}" method="post" class="text-center">
+        <label for="{{ form_fields[3] }}"></label>
+        <select name="{{ form_fields[3] }}" class="js-example-basic-single" style="width: 100%;">
             <option value=""></option>
             <option value="Public">Public</option>
             <option value="Private">Private</option>
         </select><br>
 
-        <input type="submit" value="Next">
+        <button type="submit" class="btn btn-primary mt-3">Next</button>
     </form>
 
-    <form action="{{ url_for('step', step=3) }}" method="get">
-        <input type="submit" value="Back">
+    <form action="{{ url_for('step', step=3) }}" method="get" class="text-center">
+        <button type="submit" class="btn btn-primary mt-3">Back</button>
     </form>
 
-</body>
-</html>
+    <script>
+        // Initialize Select2 on the select element
+        $(document).ready(function() {
+            $('.js-example-basic-single').select2();
+        });
+    </script>
+
+{% endblock %}
+
