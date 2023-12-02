@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # CSV Columns
 CSV_PATH = "college_data.csv"
-ENROLLMENT_COLUMN = 'DRVEF2021.Full-time undergraduate enrollment'
+SIZE_COLUMN = 'HD2021.Carnegie Classification 2021: Size and Setting'
 INSTITUTION_CATEGORY_COLUMN = 'HD2021.Institutional category'
 REGION_COLUMN = 'HD2021.Bureau of Economic Analysis (BEA) regions'
 STATE_COLUMN = 'HD2021.FIPS state code'
@@ -53,7 +53,7 @@ def display_results():
         user_preferences = {
             REGION_COLUMN: request.form.get('region') or 0,  
             STATE_COLUMN: request.form.get('state') or 0, 
-            ENROLLMENT_COLUMN: int(request.form.get('enrollment') or 0),
+            SIZE_COLUMN: request.form.get('size') or 0,
             SAT_READING_COLUMN: int(request.form.get('sat_reading') or 0),
             SAT_MATH_COLUMN: int(request.form.get('sat_math') or 0),
             ACT_COLUMN: int(request.form.get('act') or 0),
@@ -61,7 +61,7 @@ def display_results():
             GRADUATION_RATE_COLUMN: int(request.form.get('graduation_rate') or 0),
             ADMISSIONS_COLUMN: int(request.form.get('admissions') or 0),
             URBANIZATION_COLUMN: request.form.get('urbanization') or 0, 
-            NET_PRICE_COLUMN: int(request.form.get('net_price') or 0),
+            NET_PRICE_COLUMN: int(request.form.get('net_price') or 0)
         }
 
         # Load data
@@ -74,7 +74,7 @@ def display_results():
         weights = {
             REGION_COLUMN: 1,
             STATE_COLUMN: 1,
-            ENROLLMENT_COLUMN: 1,
+            SIZE_COLUMN: 1,
             SAT_READING_COLUMN: .5,
             SAT_MATH_COLUMN: .5,
             ACT_COLUMN: 1,

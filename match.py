@@ -2,7 +2,7 @@ import pandas as pd
 
 # Constants
 CSV_PATH = "college_data.csv"
-ENROLLMENT_COLUMN = 'DRVEF2021.Full-time undergraduate enrollment'
+SIZE_COLUMN = 'HD2021.Institution size category'
 INSTITUTION_CATEGORY_COLUMN = 'HD2021.Institutional category'
 REGION_COLUMN = 'HD2021.Bureau of Economic Analysis (BEA) regions'
 STATE_COLUMN = 'HD2021.FIPS state code'
@@ -23,7 +23,7 @@ def load_data(csv_path):
 
 # Drop schools without data, and that are not accreditaed 4-year schools
 def clean_data(df):
-    df = df.dropna(subset=[ENROLLMENT_COLUMN, INSTITUTION_CATEGORY_COLUMN, REGION_COLUMN, STATE_COLUMN, GRADUATION_RATE_COLUMN])
+    df = df.dropna(subset=[SIZE_COLUMN, INSTITUTION_CATEGORY_COLUMN, REGION_COLUMN, STATE_COLUMN, GRADUATION_RATE_COLUMN])
     df = df[(df[REGION_COLUMN] != 'U.S. Service schools') & (~df[REGION_COLUMN].isna())]
     df = df[df[INSTITUTION_CATEGORY_COLUMN] == 'Degree-granting, primarily baccalaureate or above']
     df['Combined Net Price'] = df[NET_PRICE_PUBLIC_COLUMN].fillna(0) + df[NET_PRICE_PRIVATE_COLUMN].fillna(0)
@@ -70,24 +70,6 @@ def calculate_admissions_match(column, weight, user_preference):
         return 0
 
 
-def calculate_enrollment_match(column, weight, user_preference):
-    try:
-        # Convert graduation rate column to float
-        column = column.astype(float)
-        user_preference = float(user_preference)
-
-        # Handle the case where user_preference is 0 to avoid division by zero
-        denominator = max(1, user_preference)
-        
-        # Calculate match scores based on the provided equation
-        match_scores = 100 - 20 * abs(column - user_preference) / denominator
-        normalized_scores = ((match_scores - match_scores.min()) / max(1, (match_scores.max() - match_scores.min()))) * 100
-
-        # Return the total match score, multiplied by the weight
-        return normalized_scores * weight
-    except ValueError:
-        return 0
-
 def calculate_price_match(column, weight, user_preference):
     try:
         # Convert the column to float
@@ -126,9 +108,7 @@ def calculate_act_match(df, weight, user_preference):
 def calculate_total_match(df, weights, preferences):
     score_columns = pd.DataFrame()
     for column, weight in weights.items():
-        if column == ENROLLMENT_COLUMN:
-            score_columns[column] = calculate_enrollment_match(df[column], weight, preferences[column])
-        elif column == SAT_READING_COLUMN or column == SAT_MATH_COLUMN:
+        if column == SAT_READING_COLUMN or column == SAT_MATH_COLUMN:
             score_columns[column] = calculate_sat_match(df, weight, preferences[column])
         elif column == ACT_COLUMN:
             score_columns[column] = calculate_act_match(df, weight, preferences[column])
@@ -154,16 +134,16 @@ def main():
 
     # CHANGE USER INPUT HERE !!
     user_preferences = {
-        REGION_COLUMN: '',
-        STATE_COLUMN: '',
-        ENROLLMENT_COLUMN: 0,
+        REGION_COLUMN: 'NaN',
+        STATE_COLUMN: 'NaN',
+        SIZE_COLUMN: 'NaM',
         SAT_READING_COLUMN: 0,
         SAT_MATH_COLUMN: 0,
         ACT_COLUMN: 0,
-        CONTROL_COLUMN: '',
+        CONTROL_COLUMN: 'NaN',
         GRADUATION_RATE_COLUMN: 0,
         ADMISSIONS_COLUMN: 0,
-        URBANIZATION_COLUMN: '',
+        URBANIZATION_COLUMN: 'NaN',
         NET_PRICE_COLUMN: 0
         
     }
@@ -172,14 +152,14 @@ def main():
     weights = {
         REGION_COLUMN: 1,
         STATE_COLUMN: 1,
-        ENROLLMENT_COLUMN:1,
+        SIZE_COLUMN: 1,
         SAT_READING_COLUMN: 1,
         SAT_MATH_COLUMN: 1,
         ACT_COLUMN: 1,
         CONTROL_COLUMN: 1,
         GRADUATION_RATE_COLUMN: 1,
         ADMISSIONS_COLUMN: 1,
-        URBANIZATION_COLUMN: 1,
+        URBANIZATION_COLUMN:1,
         NET_PRICE_COLUMN: 1
     }
 
