@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Match Form - Step 8</title>
+</head>
+<body>
+    <h1>Step 8: Enter Net Price</h1>
+
+    <form action="{{ url_for('step', step=8) }}" method="post">
+        <label for="{{ form_fields[7] }}">Enter Net Price:</label>
+        <input type="text" name="{{ form_fields[7] }}" placeholder="Enter Net Price"><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    <form action="{{ url_for('step', step=7) }}" method="get">
+        <input type="submit" value="Back">
+    </form></body>
+</html>

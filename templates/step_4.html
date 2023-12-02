@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Match Form - Step 4</title>
+</head>
+<body>
+    <h1>Step 4: Public or Private?</h1>
+
+    <form action="{{ url_for('step', step=4) }}" method="post">
+        <label for="{{ form_fields[3] }}">Control:</label>
+        <select name="{{ form_fields[3] }}">
+            <option value=""></option>
+            <option value="Public">Public</option>
+            <option value="Private">Private</option>
+        </select><br>
+
+        <input type="submit" value="Next">
+    </form>
+
+    <form action="{{ url_for('step', step=3) }}" method="get">
+        <input type="submit" value="Back">
+    </form>
+
+</body>
+</html>

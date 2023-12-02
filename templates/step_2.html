@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Match Form - Step 2</title>
+</head>
+<body>
+    <h1>Step 2: Select State(s)</h1>
+
+    <form action="{{ url_for('step', step=2) }}" method="post">
+        <label for="{{ form_fields[1] }}">State:</label>
+        <select name="{{ form_fields[1] }}">
+            <option value=""></option>
+            {% for state_value in state_values %}
+                <option value="{{ state_value }}">{{ state_value }}</option>
+            {% endfor %}
+        </select><br>
+
+        <input type="submit" value="Next">
+    </form>
+
+    <form action="{{ url_for('step', step=1) }}" method="get">
+        <input type="submit" value="Back">
+    </form>
+</body>
+</html>

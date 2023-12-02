@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Match Form - Step 7</title>
+</head>
+<body>
+    <h1>Step 7: Select Urbanization</h1>
+
+    <form action="{{ url_for('step', step=7) }}" method="post">
+        <label for="{{ form_fields[6] }}">Urbanization:</label>
+        <select name="{{ form_fields[6] }}">
+            <option value=""></option>
+            <option value="City">City</option>
+            <option value="Suburb">Suburb</option>
+            <option value="Town">Town</option>
+            <option value="Rural">Rural</option>
+        </select><br>
+
+
+        <input type="submit" value="Next">
+    </form>
+
+    <form action="{{ url_for('step', step=6) }}" method="get">
+        <input type="submit" value="Back">
+    </form>
+
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Match Form - Step 3</title>
+</head>
+<body>
+    <h1>Step 3: Select Sizes</h1>
+
+    <form action="{{ url_for('step', step=3) }}" method="post">
+        <label for="{{ form_fields[2] }}">Size:</label>
+        <select name="{{ form_fields[2] }}">
+            <option value=""></option>
+            <option value="Under 1,000">Less than 1,000 students</option>
+            <option value="1,000 - 4,999">1,000-4,999 students</option>
+            <option value="5,000 - 9,999">5,000-9,999 students</option>
+            <option value="10,000 - 19,999">10,000-19,999 students</option>
+            <option value="20,000 and above">20,000 students and above</option>
+        </select><br>
+
+        <input type="submit" value="Next">
+    </form>
+
+    <form action="{{ url_for('step', step=2) }}" method="get">
+        <input type="submit" value="Back">
+    </form>
+
+</body>
+</html>

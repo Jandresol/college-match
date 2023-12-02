@@ -1,15 +1,12 @@
-from flask import Flask, render_template, request
-from match import (
-    load_data,
-    clean_data,
-    calculate_total_match
-)
+from flask import Flask, render_template, request, redirect, url_for, session
+from match import load_data, clean_data, calculate_total_match
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'
 
 # CSV Columns
 CSV_PATH = "college_data.csv"
-SIZE_COLUMN = 'HD2021.Carnegie Classification 2021: Size and Setting'
+SIZE_COLUMN = 'HD2021.Institution size category'
 INSTITUTION_CATEGORY_COLUMN = 'HD2021.Institutional category'
 REGION_COLUMN = 'HD2021.Bureau of Economic Analysis (BEA) regions'
 STATE_COLUMN = 'HD2021.FIPS state code'
@@ -24,80 +21,81 @@ NET_PRICE_PUBLIC_COLUMN = 'SFA2021_RV.Average net price-students awarded grant o
 NET_PRICE_PRIVATE_COLUMN = 'SFA2021_RV.Average net price-students awarded grant or scholarship aid, 2020-21 Private'
 NET_PRICE_COLUMN = 'Combined Net Price'
 
+# Step Questions
+questions = [
+    'Select Region',
+    'Select State',
+    'Select Size',
+    'Select Control',
+    'Enter Graduation Rate',
+    'Enter Admissions Rate',
+    'Select Urbanization',
+    'Enter Net Price'
+]
+
+# Step Form Fields
+form_fields = [
+    REGION_COLUMN, STATE_COLUMN, SIZE_COLUMN, CONTROL_COLUMN,
+    GRADUATION_RATE_COLUMN, ADMISSIONS_COLUMN, URBANIZATION_COLUMN, NET_PRICE_COLUMN
+]
+
+# Define weights for each criterion
+weights = {
+    REGION_COLUMN: 1,
+    STATE_COLUMN: 1,
+    SIZE_COLUMN: 1,
+    CONTROL_COLUMN: 1,
+    GRADUATION_RATE_COLUMN: 1,
+    ADMISSIONS_COLUMN: 1,
+    URBANIZATION_COLUMN: 1,
+    NET_PRICE_COLUMN: 1,
+}
+
+# Load and clean data
+df = load_data("college_data.csv")
+df = clean_data(df)
+region_values = df[REGION_COLUMN].unique().tolist()
+state_values = df[STATE_COLUMN].unique().tolist()
+
 @app.route('/')
-def college_match_form():
-    # Load data
-    df = load_data(CSV_PATH)
-    
-    # Clean data
-    df = clean_data(df)
-    
-    # Get unique region values
-    region_values = df[REGION_COLUMN].unique().tolist()
-    
-    # Get unique state values
-    state_values = df[STATE_COLUMN].unique().tolist()
-    
-    # Get unique control values
-    control_values = df[CONTROL_COLUMN].unique().tolist()
-    
-    # Get unique urbanization values
-    urban_values = df[URBANIZATION_COLUMN].unique().tolist()
+def index():
+    return render_template('survey.html')
 
-    return render_template('form.html', region_values=region_values, state_values=state_values, control_values=control_values, urban_values=urban_values)
+@app.route('/restart', methods=['POST'])
+def restart():
+    # Clear the session
+    session.clear()
+    # Redirect to the beginning of the form
+    return redirect(url_for('index'))
 
-@app.route('/results', methods=['POST'])
-def display_results():
-    try:
-        # Retrieve user input from the form
-        user_preferences = {
-            REGION_COLUMN: request.form.get('region') or 0,  
-            STATE_COLUMN: request.form.get('state') or 0, 
-            SIZE_COLUMN: request.form.get('size') or 0,
-            SAT_READING_COLUMN: int(request.form.get('sat_reading') or 0),
-            SAT_MATH_COLUMN: int(request.form.get('sat_math') or 0),
-            ACT_COLUMN: int(request.form.get('act') or 0),
-            CONTROL_COLUMN: request.form.get('control') or 0,
-            GRADUATION_RATE_COLUMN: int(request.form.get('graduation_rate') or 0),
-            ADMISSIONS_COLUMN: int(request.form.get('admissions') or 0),
-            URBANIZATION_COLUMN: request.form.get('urbanization') or 0, 
-            NET_PRICE_COLUMN: int(request.form.get('net_price') or 0)
-        }
 
-        # Load data
-        df = load_data(CSV_PATH)
+@app.route('/step/<int:step>', methods=['GET', 'POST'])
+def step(step):
+    if request.method == 'POST':
+        for field in form_fields:
+            value = request.form.get(field, '').strip()
+            session[field] = value if value else session.get(field, 0)
 
-        # Clean data
-        df = clean_data(df)
+        if step < len(questions):
+            # Redirect to the next step
+            return redirect(url_for('step', step=step + 1))
+        elif step == len(questions):
+            # If on the last step, redirect to the results page
+            return redirect(url_for('results'))
 
-        # Define weights for each criterion
-        weights = {
-            REGION_COLUMN: 1,
-            STATE_COLUMN: 1,
-            SIZE_COLUMN: 1,
-            SAT_READING_COLUMN: .5,
-            SAT_MATH_COLUMN: .5,
-            ACT_COLUMN: 1,
-            CONTROL_COLUMN: 1,
-            GRADUATION_RATE_COLUMN: 1,
-            ADMISSIONS_COLUMN: 1,
-            URBANIZATION_COLUMN: 1,
-            NET_PRICE_COLUMN: 1,
-        }
+    # Render the template for the current step
+    question = questions[step - 1]
+    return render_template(f'step_{step}.html', question=question, step=step, region_values=region_values, state_values=state_values, form_fields=form_fields)
 
-        # Calculate scores for each criterion in the DataFrame
-        total_score = calculate_total_match(df, weights, user_preferences)
-
-        # Add scores to DataFrame
-        df['Percent_Match'] = total_score
-
-        # Display the institutions sorted by match score in the DataFrame
-        sorted_data = df.sort_values(by='Percent_Match', ascending=False)
-        results_html = sorted_data[['institution name', 'Percent_Match']].to_html(index=False)
-
-        return render_template('results.html', results_html=results_html)
-    except Exception as e:
-        return render_template('error.html', error=str(e))
+@app.route('/results')
+def results():
+    user_preferences = {field: session.get(field, 0) for field in form_fields}
+    total_score = calculate_total_match(df, weights, user_preferences)
+    df['Percent_Match'] = total_score
+    sorted_data = df.sort_values(by='Percent_Match', ascending=False)
+    top_ten_data = sorted_data.head(10)
+    results_html = top_ten_data[['institution name', 'Percent_Match']].to_html(index=False)
+    return render_template('results.html', results_html=results_html, region_values=region_values, state_values=state_values, form_fields=form_fields, questions=questions)
 
 if __name__ == '__main__':
     app.run(debug=True)
