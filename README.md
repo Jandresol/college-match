@@ -69,3 +69,10 @@ _Below is an example of how you can instruct your audience on installing and set
 
 <!-- USAGE EXAMPLES -->
 ## Usage
+- Register to make an account
+- Click on the survey tab in the navbar to answer the survey
+- Click through the survey and see your results
+- You can always log back in to see your results
+
+## Acknowledgements
+Data collected from <a href="https://nces.ed.gov/ipeds/Search">IPEDS</a>
