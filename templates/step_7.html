@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Step 7: Select Urbanization
+{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex align-items-center justify-content-center vh-100 mx-auto">
+        <div class="container w-100 text-center">
+            <p class="survey-heading mt-4 mb-4">Step 7: Select Urbanization</p>
+
+            <form action="/step/7" method="post" class="text-center form-width">
+                <label for="{{ form_fields[6] }}"></label>
+                <select name="{{ form_fields[6] }}" class="js-example-basic-single" style="width: 100%;" required>
+                    <option value=""></option>
+                    <option value="City">City</option>
+                    <option value="Suburb">Suburb</option>
+                    <option value="Town">Town</option>
+                    <option value="Rural">Rural</option>
+                </select><br>
+
+
+                <button type="submit" class="btn survey-button mt-3">Next</button>
+            </form>
+
+            <form action="/step/6" method="get" class="text-center">
+                <button type="submit" class="btn survey-button mt-3">Back</button>
+            </form>
+            <script>
+                // Initialize Select2 on the select element
+                $(document).ready(function() {
+                    $('.js-example-basic-single').select2();
+                });
+            </script>
+        </div>
+    </div>
+
+{% endblock %}
+
+

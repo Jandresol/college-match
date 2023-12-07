@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    College Match: Survey Completed
+{% endblock %}
+
+{% block content %}
+
+    <main class="container-fluid vh-100">
+        <div class="row">
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <div class="settings-container">
+                    <p class="settings-heading">Change Username</p>
+                    <form action="/settings/change-username" method="post" class="d-flex flex-column align-items-center">
+                        <div class="input">
+                            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="current-username" name="current-username" placeholder="Current Username" type="text">
+                        </div>
+                        <div class="input">
+                            <input class="form-control mx-auto w-auto" id="new-username" name="new-username" placeholder="New Username" type="text">
+                        </div>
+                        <div class="input">
+                            <input class="form-control mx-auto w-auto" id="confirm-username" name="confirm-username" placeholder="Confirm Username" type="text">
+                        </div>
+                        <div class="input">
+                            <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+                        </div>
+                        <div class="input">
+                            <button class="btn custom-button" id="change-username" name="change-username" type="submit">Submit</button>
+                        </div>
+                    </form> 
+                </div>
+            </div>
+    
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <div class="settings-container">
+                    <p class="settings-heading">Change Password</p>
+                    <form action="/settings/change-password" method="post" class="d-flex flex-column align-items-center">
+                        <div class="input">
+                            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+                        </div>
+                        <div class="input">
+                            <input class="form-control mx-auto w-auto" id="current-password" name="current-password" placeholder="Current Password" type="password">
+                        </div>
+                        <div class="input">
+                            <input class="form-control mx-auto w-auto" id="new-password" name="new-password" placeholder="New Password" type="password">
+                        </div>
+                        <div class="input">
+                            <input class="form-control mx-auto w-auto" id="confirm-password" name="confirm-password" placeholder="Confirm Password" type="password">
+                        </div>
+                        <div class="input">
+                            <button class="btn custom-button" id="change-password" name="change-password" type="submit">Submit</button>
+                        </div>
+                    </form> 
+                </div>
+            </div>
+        </div>
+    </main>
+
+{% endblock %}

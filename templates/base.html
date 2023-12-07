@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    {block t}{% endblock %}
+{% endblock %}
+
+{% block content %}
+    <div class="d-flex align-items-center justify-content-center vh-100 mx-auto">
+        <div class="container w-50">
+            {% block c %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}

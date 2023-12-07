@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    College Match: Confirm Retake
+{% endblock %}
+
+{% block content %}
+
+    <div class="survey-completed container-fluid vh-100">
+        <div class="row survey-completed-row">
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <div>
+                    <img src="static/survey_completed.png" alt="Vector art of college student filling out exam"  class="survey-completed-image">
+                </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column align-items-center justify-content-center">
+                <p class="confirm-retake-text">Confirm Retake</p>
+                <a href="/confirm-retake" class="btn custom-button confirm-retake-btn">YES - RETAKE SURVEY</a>
+                <a href="/" class="btn custom-button confirm-retake-btn">NO - RETURN HOME</a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

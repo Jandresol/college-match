@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    College Match
+{% endblock %}
+
+{% block content %}
+
+    <div class="landing-1">
+        <p class="landing-1-heading">
+            Find your perfect match today!
+        </p>
+    </div>
+
+    <main class="landing-2 container-fluid vh-100">
+        <div class="row landing-row">
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <div>
+                    <img src="static/landing_photo_1.png" alt="Vector art of college student completing online test"  class="landing-image">
+                </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column align-items-left">
+                <p class="landing-2-text-1">Take our personalized survey and find the <b>Top 10 Colleges</b> that fit you best</p>
+                <p class="landing-2-text-2">It takes less than 5 minutes!</p>
+                <p class="landing-2-text-3">Just answer 8 simple questions about your college preferences</p>
+                <a href="/register" class="btn custom-button landing-btn">START NOW</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 d-flex flex-column align-items-center justify-content-center">
+                <p class="landing-3-text-1">Your future is</p>
+                <a class="landing-3-text-2" href="/register">Just one click away</a>
+                <p class="landing-3-text-3">with College Match!</p>
+            </div>
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <div>
+                    <img src="static/landing_photo_2.png" alt="Vector art of college applicants recieving admissions"  class="landing-image">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <p class="landing-4-text">HEAR FROM OUR USERS</p>
+            <div class="card" style="width: 20rem;">
+                <img src="static/testimonial_1.png" class="card-img-top" alt="smiling student">
+                <div class="card-body">
+                  <h5 class="card-title">Maria Lozano</h5>
+                  <p class="card-text">Before College Match I had no idea where I wanted to go. Now, I feel ready to face my college applications!</p>
+                </div>
+              </div>
+              <div class="card" style="width: 20rem;">
+                <img src="static/testimonial_2.png" class="card-img-top" alt="smiling student">
+                <div class="card-body">
+                  <h5 class="card-title">John Rollins</h5>
+                  <p class="card-text">Thanks to College Match, I found the perfect school for me. I don't know what I would have done without it!</p>
+                </div>
+              </div>
+              <div class="card" style="width: 20rem;">
+                <img src="static/testimonial_3.png" class="card-img-top" alt="smiling student">
+                <div class="card-body">
+                  <h5 class="card-title">Carly Golden</h5>
+                  <p class="card-text">College Match helped me realize what I really care about. It has totally transformed my college experience!</p>
+                </div>
+              </div>
+        </div>
+    </main>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Step 4: Public or Private?
+{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex align-items-center justify-content-center vh-100 mx-auto">
+        <div class="container w-100 text-center">
+            <p class="survey-heading mt-4 mb-4">Step 4: School type?</p>
+
+            <form action="/step/4" method="post" class="text-center form-width">
+                <label for="{{ form_fields[3] }}"></label>
+                <select name="{{ form_fields[3] }}" class="js-example-basic-single" style="width: 100%;" required>
+                    <option value=""></option>
+                    <option value="Public">Public</option>
+                    <option value="Private">Private</option>
+                </select><br>
+
+                <button type="submit" class="btn survey-button mt-3">Next</button>
+            </form>
+
+            <form action="/step/3" method="get" class="text-center">
+                <button type="submit" class="btn survey-button mt-3">Back</button>
+            </form>
+
+            <script>
+                // Initialize Select2 on the select element
+                $(document).ready(function() {
+                    $('.js-example-basic-single').select2();
+                });
+            </script>
+        </div>
+    </div>
+
+{% endblock %}
+

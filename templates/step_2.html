@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Step 2: Select States
+{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex align-items-center justify-content-center vh-100 mx-auto">
+        <div class="container w-100 text-center">
+            <p class="survey-heading mt-4 mb-4">Step 2: Select State</p>
+
+            <form action="/step/2" method="post" class="text-center form-width">
+                <label for="{{ form_fields[1] }}"></label>
+                <select name="{{ form_fields[1] }}" class="js-example-basic-single" style="width: 100%;" required>
+                    <option value=""></option>
+                    {% for state_value in state_values %}
+                        <option value="{{ state_value }}">{{ state_value }}</option>
+                    {% endfor %}
+                </select><br>
+
+                <button type="submit" class="btn survey-button mt-3">Next</button>
+            </form>
+
+            <form action="/step/1" method="get" class="text-center">
+                <button type="submit" class="btn survey-button mt-3">Back</button>
+            </form>
+
+            <script>
+                // Initialize Select2 on the select element
+                $(document).ready(function() {
+                    $('.js-example-basic-single').select2();
+                });
+            </script>
+        </div>
+    </div>
+
+{% endblock %}

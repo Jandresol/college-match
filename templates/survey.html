@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Get Matched with a College!
+{% endblock %}
+
+{% block content %}
+
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="container text-center">
+            <p class="survey-heading">Take Our College Matching Quiz!</p>
+            <p class="survey-subheading mb-4">Explore your educational journey with our college matching system</p>
+            <form action="/survey" method="post" class="d-inline-block">
+                <button type="submit" class="btn survey-button">BEGIN SURVEY</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

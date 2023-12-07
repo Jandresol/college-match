@@ -1,12 +1,35 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>College Match Results</title>
-</head>
-<body>
-    <h1>College Match Results</h1>
-    {{ results_html|safe }}
-</body>
-</html>
+{% extends "layout.html" %}
+
+{% block title %}
+    Results
+{% endblock %}
+
+{% block content %}
+
+    <div class="container mt-4">
+        <p class="results-heading">Top 10 Matching Institutions</p>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Institution Name</th>
+                        <th class="text-center">Percent Match</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for index, row in top_ten_data.iterrows() %}
+                        <tr>
+                            <td>
+                                <a class="schools" href="https://www.google.com/search?q={{ row['institution name'] }}">{{ row['institution name'] }}</a>
+                            </td>
+                            <td class="text-center">{{ row['Percent_Match']|round|int }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
+

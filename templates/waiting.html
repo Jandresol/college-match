@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    College Match: Dashboard
+{% endblock %}
+
+{% block content %}
+
+    <div class="waiting container-fluid vh-100">
+        <div class="row waiting-row">
+            <div class="col-md-6 d-flex flex-column align-items-center">
+                <div>
+                    <img src="static/waiting.png" alt="Vector art of college student filling out exam"  class="waiting-image">
+                </div>
+            </div>
+            <div class="col-md-6 d-flex flex-column align-items-center justify-content-center">
+                <p class="waiting-text-1">WELCOME!</p>
+                <p class="waiting-text-2">Your results will not appear</p>
+                <p class="waiting-text-3">until you take the survey</p>
+                <a href="/survey" class="btn custom-button waiting-btn">TAKE SURVEY</a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

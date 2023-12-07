@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Step 1: Select Region
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="d-flex align-items-center justify-content-center vh-100 mx-auto">
+        <div class="container w-100 text-center">
+            <p class="survey-heading mt-4 mb-4">Step 1: Select Region</p>
+
+            <form action="/step/1" method="post" class="text-center form-width">
+                <label for="{{ form_fields[0] }}"></label>
+                <select name="{{ form_fields[0] }}" class="js-example-basic-single form-select" style="width: 100%;" required>
+                    <option value=""></option>
+                    {% for region_value in region_values %}
+                        <option value="{{ region_value }}">{{ region_value }}</option>
+                    {% endfor %}
+                </select><br>
+            
+                <button type="submit" class="btn survey-button mt-3">Next</button>
+            </form>
+
+            <script>
+                // Initialize Select2 on the select element
+                $(document).ready(function() {
+                    $('.js-example-basic-single').select2();
+                });
+            </script>
+        </div>
+    </div>
+
+{% endblock %}

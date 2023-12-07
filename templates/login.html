@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    College Match: Log In
+{% endblock %}
+
+{% block content %}
+
+    <main class="container py-5 d-flex justify-content-center vh-100">
+        <div class="login-container justify-content-center">
+            <p class="login-heading-1">LOG IN</p>
+            <form action="/login" method="post" class="d-flex flex-column align-items-center">
+                <div class="input">
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
+                </div>
+                <div class="input">
+                    <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
+                </div>
+                <div class="input">
+                    <button class="btn custom-button" type="submit">Continue</button>
+                </div>
+            </form> 
+            <p class="register-message">Don't have an account yet? </p>
+            <a class="link" href="/register">Register Here</a>
+            <p> </p>
+        </div>
+        <div class="additional-content justify-content-center">
+            <div>
+                <p class="login-heading-2">Welcome Back!</p>
+            </div>
+            <div>
+                <img src="static/login_photo.png" alt="Vector art of college students"  class="login-image">
+            </div>
+        </div>
+    </main>  
+
+{% endblock %}
