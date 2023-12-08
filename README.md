@@ -54,7 +54,15 @@ _Below is an example of how you can instruct your audience on installing and set
    ```sh
    cd college-match
    ```
-3. Run app.py 
+3. Install CS50
+   ```sh
+   pip install cs50
+   ```
+4. Install Flask-session
+   ```sh
+   pip install Flask-Session 
+   ```
+5. Run app.py 
    ```sh
    flask run
    ```
