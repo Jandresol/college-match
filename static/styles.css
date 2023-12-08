@@ -59,6 +59,12 @@ nav .nav-link.disabled {
     color: var(--c7) !important;
   }
 
+.navbar-toggler-icon {
+    color: var(--c7) !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 20px !important;
+}
+
 .landing-1 {
     position: relative;
     z-index: -1;
