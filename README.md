@@ -76,3 +76,4 @@ _Below is an example of how you can instruct your audience on installing and set
 
 ## Acknowledgements
 Data collected from <a href="https://nces.ed.gov/ipeds/Search">IPEDS</a>
+Educational illustrations by <a href="https://storyset.com/">Storyset</a>
