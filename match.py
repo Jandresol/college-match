@@ -122,7 +122,7 @@ def calculate_act_match(df, weight, user_preference):
     act_match = df[ACT_COLUMN].dropna().astype(float).apply(lambda x: max(0, 100 - abs(x - user_preference)))
     return act_match * weight
 
-
+# Calculate total match
 def calculate_total_match(df, weights, preferences):
     score_columns = pd.DataFrame()
     for column, weight in weights.items():

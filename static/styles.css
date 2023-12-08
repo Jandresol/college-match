@@ -488,7 +488,7 @@ tbody {
 .schools:hover {
     color: var(--c7);
  }
-
+ 
 tbody tr:hover {
     background-color: var(--c2); /* Change the background color on hover */
 }
