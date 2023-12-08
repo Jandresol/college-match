@@ -10,7 +10,7 @@
 
   <h3 align="center">College Match Readme</h3>
 
-![](https://github.com/Jandresol/college-match/website.gif)
+<img src="https://github.com/Jandresol/college-match/blob/main/website.gif" alt="Website GIF" width="800" height="400">
 
 
 <!-- ABOUT THE PROJECT -->
