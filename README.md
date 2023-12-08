@@ -20,6 +20,8 @@ This is a CS50 final project made in collaboration with Jasmine Andresol and Mat
 
 College Match is a website aimed at prospective college students searching for what college to apply to. Users can create their profile, take the quiz, and discover what colleges await them! The matching algorithm compares the user's preferences with a database of 2,000+ colleges across the country to find the best match!
 
+## Youtube Video
+Our youtube video is <a href="https://youtu.be/_MWHKDGgQgw">linked here</a>
 
 ### Built With
 
